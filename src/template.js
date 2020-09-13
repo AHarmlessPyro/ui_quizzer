@@ -1,46 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
 
-class Template extends React.Component {
-    constructor(props) {
-        // super(props)
-        this.state = {
-            scores: {},
-            clicked: false
-        }
-    }
+const Template = (props) => {
 
-    onClickStatusChange = (evt) => {
+    const [scores, setScores] = useState(null)
+    const [clicked, setClicked] = useState(false)
+
+    useEffect(() => {
         fetch(`${this.props.baseAddress}/scores`, {
             credentials: "include"
         })
             .then((res) => {
                 res.json()
                     .then((data) => {
-                        this.setState({
-                            scores: data
-                        })
-                        this.props.callback()
+                        setScores(data)
+                        props.callback()
                     })
             })
-    }
+    })
 
-    render() {
-        return (
-            <div className="App" >
-                <header className="App-header">
-                    <center>
-                        <div className="loginScreen borderStandard" >
-                            {this.props.children}
-                        </div>
-                        <div className="borderStandard">
-                            <button onClick={this.onClickStatusChange.bind(this)} className="borderStandard" >See Scores</button>
-                        </div>
-                    </center>
-                </header>
-            </div >
-        )
-    }
+    return (
+        <div className="App" >
+            <header className="App-header">
+                <center>
+                    <div className="loginScreen borderStandard" >
+                        {props.children}
+                    </div>
+                    <div className="borderStandard">
+                        <button onClick={setClicked(!clicked)} className="borderStandard" >See Scores</button>
+                    </div>
+                    {scores}
+                </center>
+            </header>
+        </div >
+    )
 }
 export default Template;

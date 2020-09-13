@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import logo_temp from './logo_temp_1.png'
-import Template from './template'
+//import Template from './template'
 import './App.css';
 
 /**
@@ -12,49 +12,73 @@ import './App.css';
  * scores
  */
 
-// const Template = (props) => {
-//   const [scores, setScore] = useState({})
-//   const [clicked, setClick] = useState(false)
-
-//   useEffect(
-//     function fetchScores() {
-//       debugger;
-//       fetch(`${props.baseAddress}/scores`, {
-//         credentials: "include"
-//       })
-//         .then((res) => {
-//           res.json()
-//             .then((data) => {
-//               setScore(data)
-//               //props.callback()
-//             })
-//         })
-//     }
-//     , [clicked])
-
-
-//   return (
-//     <div className="App" >
-//       <header className="App-header">
-//         <center>
-//           <div className="loginScreen borderStandard" >
-//             {props.children}
-//           </div>
-//           <div className="borderStandard">
-//             <button onClick={setClick(!clicked)} className="borderStandard" >See Scores</button>
-//           </div>
-//         </center>
-//       </header>
-//     </div >
-//   )
-// }
+const Template = (props) => {
+  return (
+    <div className="App" >
+      <header className="App-header">
+        <center>
+          <div className="loginScreen borderStandard" >
+            {props.children}
+          </div>
+          <div className="borderStandard" style={{ color: "var(--base-color)" }}>
+            <button onClick={() => {
+              document.getElementById('scoreMenu') &&
+                document.getElementById('scoreMenu').classList.remove("inVisible")
+            }} className="borderStandard" >See Scores</button>
+          </div>
+        </center>
+      </header>
+      <div id="scoreMenu" style={{ position: "fixed", width: "100%", top: "0%", textAlign: "center" }}>
+        {/* <center> */}
+        <div style={{
+          "marginBottom": "30px", "borderBottom": "1px solid var(--base-color)"
+        }}>
+          <button
+            className="borderStandard"
+            style={{ height: "35px" }}
+            onClick={() => {
+              document.getElementById('scoreMenu') &&
+                document.getElementById('scoreMenu').classList.add('inVisible')
+            }}> Close this </button>
+        </div>
+        <table style={{ width: "400px", height: "500px" }}>
+          <tr>
+            <th>
+              Name
+              </th>
+            <th>
+              T1 Score
+              </th>
+            <th>
+              T2 Score
+              </th>
+            <th>
+              T3 Score
+              </th>
+          </tr>
+          {props.scores && props.scores.map((value) => {
+            return (
+              <tr>
+                <td>{value.name}</td>
+                <td>{value.t1.score}</td>
+                <td>{value.t2.score}</td>
+                <td>{value.t3.score}</td>
+              </tr>
+            )
+          })}
+        </table>
+        {/* </center> */}
+      </div >
+    </div >
+  )
+}
 
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.baseAddress = `http://127.0.0.1:3000` //`https://qui-zup.herokuapp.com`//
+    this.baseAddress = `https://qui-zup.herokuapp.com`//`http://127.0.0.1:3000`
 
     this.state = {
       // current: "login",
@@ -63,7 +87,8 @@ class App extends React.Component {
       currentQuiz: null,
       currentQuestion: null,
       notice: null,
-      scores: null
+      scores: null,
+      scoresVisibile: "none"
     }
   }
 
@@ -76,8 +101,6 @@ class App extends React.Component {
       .then((res) => {
         res.json()
           .then((data) => {
-            debugger;
-            console.log(data)
             if (data.reg) {
               fetch(`${this.baseAddress}/listOfQuizzes`, {
                 credentials: "include"
@@ -109,7 +132,6 @@ class App extends React.Component {
       })
         .then((res) => {
           debugger;
-          console.log(res)
           fetch(`${this.baseAddress}/listOfQuizzes`, {
             credentials: "include"
           })
@@ -164,7 +186,6 @@ class App extends React.Component {
   }
 
   answerButtonClickHandler = (evt) => {
-    console.log(evt.target)
     fetch(`${this.baseAddress}/getQuestion/${this.state.currentQuiz}/${this.state.currentQuestion.index}/${evt.target.dataset.correct}`, {
       credentials: "include"
     })
@@ -197,7 +218,6 @@ class App extends React.Component {
         res.json()
           .then((data) => {
             this.setState({
-              current: "scores",
               scores: data
             })
           })
@@ -211,11 +231,21 @@ class App extends React.Component {
     })
   }
 
+  reverseVisiblityScores() {
+    console.log("running reversal");
+    if (this.state.scoresVisible === 'none') {
+      this.setState({ scoresVisible: "" })
+    } else {
+      this.setState({ scoresVisible: "none" })
+    }
+  }
+
+
   render() {
 
     if (this.state.current === 'login') {
       return (
-        Template(
+        <Template scoreFunction={this.seeScores.bind(this)} scores={this.state.scores}>
           <div>
             <img className="logoImg" src={logo_temp} ></img>
             <div className="userName">
@@ -232,11 +262,11 @@ class App extends React.Component {
               <button className="borderStandard" onClick={this.seeScores.bind(this)}>see scores</button>
             </div>
           </div>
-        )
+        </Template>
       )
     } else if (this.state.current === "quiz selection") {
       return (
-        Template(
+        <Template scoreFunction={this.seeScores.bind(this)} scores={this.state.scores}>
           <div>
             <span className="headerText">Select a Quiz :</span>
             <div className="loginButtons">
@@ -245,7 +275,7 @@ class App extends React.Component {
               })}
             </div>
           </div >
-        )
+        </Template>
       )
     } else if (this.state.current === 'quiz') {
       let internalValueToDisplay = <div>
@@ -267,7 +297,7 @@ class App extends React.Component {
       }
 
       return (
-        Template(
+        <Template scoreFunction={this.seeScores.bind(this)} scores={this.state.scores}>
           <div>
             <div style={{
               "marginBottom": "30px", "borderBottom": "1px solid var(--base-color)"
@@ -276,19 +306,15 @@ class App extends React.Component {
             </div>
             {internalValueToDisplay}
           </div >
-        )
-      )
-    } else if (this.state.current === 'scores') {
-      return (
-        Template(
-
-        )
+        </Template>
       )
     } else {
       return (
-        <div className="header">
-          We're loading Stuff. Either than or something went seriously wrong.
+        <Template scoreFunction={this.seeScores.bind(this)} scores={this.state.scores} >
+          <div className="header">
+            We're loading Stuff. Either than or something went seriously wrong.
         </div>
+        </Template>
       )
     }
   }
