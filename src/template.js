@@ -3,9 +3,27 @@ import './App.css';
 
 
 class Template extends React.Component {
-
     constructor(props) {
-        super(props)
+        // super(props)
+        this.state = {
+            scores: {},
+            clicked: false
+        }
+    }
+
+    onClickStatusChange = (evt) => {
+        fetch(`${this.props.baseAddress}/scores`, {
+            credentials: "include"
+        })
+            .then((res) => {
+                res.json()
+                    .then((data) => {
+                        this.setState({
+                            scores: data
+                        })
+                        this.props.callback()
+                    })
+            })
     }
 
     render() {
@@ -16,9 +34,13 @@ class Template extends React.Component {
                         <div className="loginScreen borderStandard" >
                             {this.props.children}
                         </div>
+                        <div className="borderStandard">
+                            <button onClick={this.onClickStatusChange.bind(this)} className="borderStandard" >See Scores</button>
+                        </div>
                     </center>
                 </header>
             </div >
         )
     }
-} export default Template;
+}
+export default Template;

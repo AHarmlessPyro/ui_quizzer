@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import logo_temp from './logo_temp_1.png'
+import Template from './template'
 import './App.css';
 
 /**
@@ -11,26 +12,49 @@ import './App.css';
  * scores
  */
 
-function template(internalHTML) {
-  return (
-    <div className="App" >
-      <header className="App-header">
-        <center>
-          <div className="loginScreen borderStandard" >
-            {internalHTML}
-          </div>
-        </center>
-      </header>
-    </div >
-  )
-}
+// const Template = (props) => {
+//   const [scores, setScore] = useState({})
+//   const [clicked, setClick] = useState(false)
+
+//   useEffect(
+//     function fetchScores() {
+//       debugger;
+//       fetch(`${props.baseAddress}/scores`, {
+//         credentials: "include"
+//       })
+//         .then((res) => {
+//           res.json()
+//             .then((data) => {
+//               setScore(data)
+//               //props.callback()
+//             })
+//         })
+//     }
+//     , [clicked])
+
+
+//   return (
+//     <div className="App" >
+//       <header className="App-header">
+//         <center>
+//           <div className="loginScreen borderStandard" >
+//             {props.children}
+//           </div>
+//           <div className="borderStandard">
+//             <button onClick={setClick(!clicked)} className="borderStandard" >See Scores</button>
+//           </div>
+//         </center>
+//       </header>
+//     </div >
+//   )
+// }
 
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.baseAddress = `https://qui-zup.herokuapp.com`//`http://127.0.0.1:3000`
+    this.baseAddress = `http://127.0.0.1:3000` //`https://qui-zup.herokuapp.com`//
 
     this.state = {
       // current: "login",
@@ -191,7 +215,7 @@ class App extends React.Component {
 
     if (this.state.current === 'login') {
       return (
-        template(
+        Template(
           <div>
             <img className="logoImg" src={logo_temp} ></img>
             <div className="userName">
@@ -212,7 +236,7 @@ class App extends React.Component {
       )
     } else if (this.state.current === "quiz selection") {
       return (
-        template(
+        Template(
           <div>
             <span className="headerText">Select a Quiz :</span>
             <div className="loginButtons">
@@ -243,7 +267,7 @@ class App extends React.Component {
       }
 
       return (
-        template(
+        Template(
           <div>
             <div style={{
               "marginBottom": "30px", "borderBottom": "1px solid var(--base-color)"
@@ -256,34 +280,15 @@ class App extends React.Component {
       )
     } else if (this.state.current === 'scores') {
       return (
-        template(
-          <table>
-            {this.state.scores.map((value) => {
-              return (
-                <tr>
-                  <th>
-                    {value.name}
-                  </th>
-                  <th>
-                    {value.t1.score}
-                  </th>
-                  <th>
-                    {value.t2.score}
-                  </th>
-                  <th>
-                    {value.t3.score}
-                  </th>
-                </tr>
-              )
-            })}
-          </table>
+        Template(
+
         )
       )
     } else {
       return (
-        template(<div className="header">
+        <div className="header">
           We're loading Stuff. Either than or something went seriously wrong.
-      </div>)
+        </div>
       )
     }
   }
