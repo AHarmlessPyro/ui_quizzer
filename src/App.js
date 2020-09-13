@@ -265,13 +265,13 @@ class App extends React.Component {
                     {value.name}
                   </th>
                   <th>
-                    {value.t1}
+                    {value.t1.score}
                   </th>
                   <th>
-                    {value.t2}
+                    {value.t2.score}
                   </th>
                   <th>
-                    {value.t3}
+                    {value.t3.score}
                   </th>
                 </tr>
               )
@@ -280,9 +280,11 @@ class App extends React.Component {
         )
       )
     } else {
-      return (<div>
-        Womp Womp
+      return (
+        template(<div className="header">
+          We're loading Stuff. Either than or something went seriously wrong.
       </div>)
+      )
     }
   }
 }
