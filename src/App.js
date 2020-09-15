@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import logo_temp from './logo_temp_1.png'
-//import Template from './template'
+import classNames from 'classnames'
+import backArrow from './back-arrow.png'
+import frontArrow from './share.png'
 import './App.css';
 
 /**
@@ -13,6 +15,31 @@ import './App.css';
  */
 
 const Template = (props) => {
+  let tableHeader = (
+    <tr>
+      <th>
+        Name
+  </th>
+      <th>
+        T1 Score
+  </th>
+      <th>
+        T1 Time
+  </th>
+      <th>
+        T2 Score
+  </th>
+      <th>
+        T2 Time
+  </th>
+      <th>
+        T3 Score
+  </th>
+      <th>
+        T3 Time
+  </th>
+    </tr>)
+
   return (
     <div className="App" >
       <header className="App-header">
@@ -21,53 +48,98 @@ const Template = (props) => {
             {props.children}
           </div>
           <div className="borderStandard" style={{ color: "var(--base-color)" }}>
-            <button onClick={() => {
-              document.getElementById('scoreMenu') &&
-                document.getElementById('scoreMenu').classList.remove("inVisible")
+            <button onClick={(evt) => {
+              props.scoreFunction(evt);
+              props.reverseVisibility();
             }} className="borderStandard" >See Scores</button>
           </div>
         </center>
       </header>
-      <div id="scoreMenu" style={{ position: "fixed", width: "100%", top: "0%", textAlign: "center" }}>
-        {/* <center> */}
-        <div style={{
-          "marginBottom": "30px", "borderBottom": "1px solid var(--base-color)"
-        }}>
-          <button
-            className="borderStandard"
-            style={{ height: "35px" }}
-            onClick={() => {
-              document.getElementById('scoreMenu') &&
-                document.getElementById('scoreMenu').classList.add('inVisible')
-            }}> Close this </button>
-        </div>
-        <table style={{ width: "400px", height: "500px" }}>
-          <tr>
-            <th>
-              Name
-              </th>
-            <th>
-              T1 Score
-              </th>
-            <th>
-              T2 Score
-              </th>
-            <th>
-              T3 Score
-              </th>
-          </tr>
-          {props.scores && props.scores.map((value) => {
-            return (
-              <tr>
-                <td>{value.name}</td>
-                <td>{value.t1.score}</td>
-                <td>{value.t2.score}</td>
-                <td>{value.t3.score}</td>
-              </tr>
-            )
-          })}
-        </table>
-        {/* </center> */}
+      <div id="scoreMenu" className={classNames({
+        "inVisible": props.visibility,
+        "Visible": !props.visibility
+      })} >
+        <center>
+          <div style={{
+            "borderBottom": "1px solid var(--base-color)"
+          }}>
+            <button
+              className="borderStandard"
+              style={{ height: "35px" }}
+              onClick={() => {
+                props.reverseVisibility();
+              }}> Close this </button>
+          </div>
+          <table style={{ width: "400px", height: "100%" }}>
+            {props.scores &&
+              <div>
+                <span className="headerText">Your Stats : </span>
+                {tableHeader}
+                < tr >
+                  <td>{props.scores.self.name}</td>
+                  <td>{props.scores.self.t1.score} </td>
+                  <td> {props.format(props.scores.self.t1.time)}</td>
+                  <td>{props.scores.self.t2.score}</td>
+                  <td> {props.format(props.scores.self.t2.time)}</td>
+                  <td>{props.scores.self.t3.score}</td>
+                  <td> {props.format(props.scores.self.t3.time)}</td>
+                </tr>
+              </div>
+            }
+            {props.scores && props.scores['t1'].map((value) => {
+              return (
+                <div>
+                  <span className="headerText">Task-1</span>
+                  {tableHeader}
+                  <tr>
+                    <td>{value.name}</td>
+                    <td>{value.t1.score}</td>
+                    <td> {props.format(value.t1.time)}</td>
+                    <td>{value.t2.score}</td>
+                    <td> {props.format(value.t2.time)}</td>
+                    <td>{value.t3.score}</td>
+                    <td> {props.format(value.t3.time)}</td>
+                  </tr>
+                </div>
+              )
+            })}
+            {props.scores && props.scores['t2'].map((value) => {
+              return (
+                <div>
+                  <span className="headerText">Task-2</span>
+                  {tableHeader}
+
+                  <tr>
+                    <td>{value.name}</td>
+                    <td>{value.t1.score}</td>
+                    <td> {props.format(value.t1.time)}</td>
+                    <td>{value.t2.score}</td>
+                    <td> {props.format(value.t2.time)}</td>
+                    <td>{value.t3.score}</td>
+                    <td> {props.format(value.t3.time)}</td>
+                  </tr>
+                </div>
+              )
+            })}
+            {props.scores && props.scores['t3'].map((value) => {
+              return (
+                <div>
+                  <span className="headerText">Task-3 </span>
+                  {tableHeader}
+                  <tr>
+                    <td>{value.name}</td>
+                    <td>{value.t1.score}</td>
+                    <td> {props.format(value.t1.time)}</td>
+                    <td>{value.t2.score}</td>
+                    <td> {props.format(value.t2.time)}</td>
+                    <td>{value.t3.score}</td>
+                    <td> {props.format(value.t3.time)}</td>
+                  </tr>
+                </div>
+              )
+            })}
+          </table>
+        </center>
       </div >
     </div >
   )
@@ -81,15 +153,21 @@ class App extends React.Component {
     this.baseAddress = `https://qui-zup.herokuapp.com`//`http://127.0.0.1:3000`
 
     this.state = {
-      // current: "login",
       quizOptions: null,
       inputNameValue: null,
       currentQuiz: null,
       currentQuestion: null,
       notice: null,
       scores: null,
-      scoresVisibile: "none"
+      scoresVisible: true,
+      startTime: { "t1": null, "t2": null, "t3": null }
     }
+  }
+
+  timeFormat = (millis) => {
+    let minutes = Math.floor(millis / 60000);
+    let seconds = ((millis % 60000) / 1000).toFixed(0)
+    return minutes + ":" + (seconds < 10 ? '0' : "") + seconds
   }
 
   componentDidMount() {
@@ -116,7 +194,8 @@ class App extends React.Component {
                 })
             } else {
               this.setState({
-                current: "login"
+                current: "login",
+                inputNameValue: data.user
               })
             }
           })
@@ -166,18 +245,47 @@ class App extends React.Component {
         res.json()
           .then((data) => {
             fetch(`${this.baseAddress}/getQuestion/${quizToGo}/${data.redirectTo}`, {
+              method: "POST",
               credentials: "include"
             })
               .then((res2) => {
                 res2.json()
                   .then((data2) => {
+
+                    let startTime = Object.assign({}, this.state.startTime)
+                    startTime[quizToGo] = data.startTime
                     this.setState({
                       currentQuestion: data2.questions,
                       notice: data2.notice,
                       maxCount: data2.maxCount,
                       currentQuiz: quizToGo,
-                      current: "quiz"
+                      current: "quiz",
+                      startTime: startTime
                     })
+                    window.setTimeout(function () {
+                      fetch(`${this.baseAddress}/getQuestion/${quizToGo}/${this.state.maxCount}`, {
+                        method: "POST",
+                        credentials: "include"
+                      })
+                        .then((res) => {
+                          this.setState({
+                            questions: {
+                              "index": 11,
+                              "question": "Something went Wrong! Oops",
+                              "answer": [],
+                              "correct": -1
+                            },
+                            maxCount: data.maxCount
+                          })
+                          fetch(`${this.baseAddress}/endTimer/${(new Date()).getTime()}/${this.state.currentQuiz}`, {
+                            method: "POST",
+                            credentials: "include"
+                          })
+                        })
+                    }.bind(this), 121000);
+                    window.setTimeout(function () {
+                      alert("30 seconds left")
+                    }, 90000)
                   })
               })
 
@@ -187,6 +295,7 @@ class App extends React.Component {
 
   answerButtonClickHandler = (evt) => {
     fetch(`${this.baseAddress}/getQuestion/${this.state.currentQuiz}/${this.state.currentQuestion.index}/${evt.target.dataset.correct}`, {
+      method: "POST",
       credentials: "include"
     })
       .then((res) => {
@@ -206,7 +315,6 @@ class App extends React.Component {
       })
     }
   }
-
 
   seeScores = (evt) => {
     debugger;
@@ -233,21 +341,44 @@ class App extends React.Component {
 
   reverseVisiblityScores() {
     console.log("running reversal");
-    if (this.state.scoresVisible === 'none') {
-      this.setState({ scoresVisible: "" })
+    if (this.state.scoresVisible === true) {
+      this.setState({ scoresVisible: false })
     } else {
-      this.setState({ scoresVisible: "none" })
+      this.setState({ scoresVisible: true })
     }
   }
 
+  previousQuestionCLickHandler = (evt, direction) => {
+    let bodyText = { "back": false }
+    if (direction === 'back') {
+    } else if (direction === 'next') {
+      // continue. Nothing to see here.
+    }
+    fetch(`${this.baseAddress}/getQuestion/${this.state.currentQuiz}/${this.state.currentQuestion.index}`, {
+      method: "POST",
+      credentials: "include",
+      body: bodyText
+    })
+      .then((res) => {
+        res.json()
+          .then((data) => {
+            this.setState({
+              currentQuestion: data.questions,
+              notice: data.notice,
+              maxCount: data.maxCount,
+            })
+          })
+      })
+
+  }
 
   render() {
 
     if (this.state.current === 'login') {
       return (
-        <Template scoreFunction={this.seeScores.bind(this)} scores={this.state.scores}>
+        <Template format={this.timeFormat} scoreFunction={this.seeScores.bind(this)} scores={this.state.scores} visibility={this.state.scoresVisible} reverseVisibility={this.reverseVisiblityScores.bind(this)}>
           <div>
-            <img className="logoImg" src={logo_temp} ></img>
+            <img className="logoImg" alt="NMLC logo" src={logo_temp} ></img>
             <div className="userName">
               <input
                 type="text"
@@ -266,7 +397,7 @@ class App extends React.Component {
       )
     } else if (this.state.current === "quiz selection") {
       return (
-        <Template scoreFunction={this.seeScores.bind(this)} scores={this.state.scores}>
+        <Template format={this.timeFormat} scoreFunction={this.seeScores.bind(this)} scores={this.state.scores} visibility={this.state.scoresVisible} reverseVisibility={this.reverseVisiblityScores.bind(this)}>
           <div>
             <span className="headerText">Select a Quiz :</span>
             <div className="loginButtons">
@@ -286,6 +417,7 @@ class App extends React.Component {
           {this.state.currentQuestion.answer.map((data, index) => {
             return <button style={{ "paddingBottom": "30px", "marginBottom": "30px" }} onClick={this.answerButtonClickHandler.bind(this)} name={index} data-correct={index === this.state.currentQuestion.correct} className="borderStandard" key={data}>{data}</button>
           })}
+          {this.timeFormat((new Date()).getTime() - this.state.currentQuiz ? this.startTime[this.state.currentQuiz] : 0)}
         </div>
       </div >
 
@@ -296,13 +428,27 @@ class App extends React.Component {
         </div>
       }
 
+      let forwardEnable = true
+      let backwardEnable = true
+      if (this.state.currentQuestion) {
+        if (this.state.currentQuestion.index === this.maxCount) {
+          forwardEnable = false
+        }
+        if (this.state.currentQuestion.index === 1) {
+          backwardEnable = false
+        }
+      }
       return (
-        <Template scoreFunction={this.seeScores.bind(this)} scores={this.state.scores}>
+        <Template format={this.timeFormat} scoreFunction={this.seeScores.bind(this)} scores={this.state.scores} visibility={this.state.scoresVisible} reverseVisibility={this.reverseVisiblityScores.bind(this)}>
           <div>
             <div style={{
               "marginBottom": "30px", "borderBottom": "1px solid var(--base-color)"
             }}>
+              <img disabled={`${backwardEnable}`} src={backArrow} alt="previous question" style={{ height: "35px" }} onClick={this.previousQuestionCLickHandler.bind(this, "back")}>
+              </img>
               <button className="borderStandard" style={{ height: "35px" }} onClick={this.backButtonClickHandler.bind(this)}>Back To Quiz Selection</button>
+              <img disabled={`${forwardEnable}`} src={frontArrow} alt="next question" style={{ height: "35px" }} onClick={this.previousQuestionCLickHandler.bind(this, "next")}>
+              </img>
             </div>
             {internalValueToDisplay}
           </div >
@@ -310,7 +456,7 @@ class App extends React.Component {
       )
     } else {
       return (
-        <Template scoreFunction={this.seeScores.bind(this)} scores={this.state.scores} >
+        <Template format={this.timeFormat} scoreFunction={this.seeScores.bind(this)} scores={this.state.scores} visibility={this.state.scoresVisible} reverseVisibility={this.reverseVisiblityScores.bind(this)}>
           <div className="header">
             We're loading Stuff. Either than or something went seriously wrong.
         </div>

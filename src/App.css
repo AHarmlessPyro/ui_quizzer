@@ -11,6 +11,19 @@
   display: none;
 }
 
+.Visible {
+  position: fixed;
+  width: 100%;
+  top: -9.1%;
+  text-align: center;
+  margin-top: calc((100vh - 400px)/2);
+  display: flex;
+  justify-items: center;
+  flex-direction: column;
+  height: 502px;
+  background-color: var(--highlight-color);
+}
+
 .notice {
   color: var(--base-color);
   font-size: small
